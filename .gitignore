@@ -159,3 +159,9 @@ cython_debug/
 
 # DB
 *.db
+
+# dotenv
+.env
+
+# config file
+conf/detectors.json
