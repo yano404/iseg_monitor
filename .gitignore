@@ -164,4 +164,4 @@ cython_debug/
 .env
 
 # config file
-conf/detectors.json
+iseg_monitor/conf/detectors.json
