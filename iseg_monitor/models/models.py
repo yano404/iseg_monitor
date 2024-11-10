@@ -1,4 +1,5 @@
 from sqlmodel import Field, SQLModel, Relationship
+from pydantic import BaseModel
 from typing import Optional
 
 class Detector(SQLModel, table=True):
@@ -29,3 +30,9 @@ class Current(SQLModel, table=True):
     channel: int
     value: float # mA
     time: float
+
+class TimeSeries(BaseModel):
+    time: list[float]
+    value: list[float]
+    def __init__(self, time: list[float], value: list[float]):
+        super().__init__(time=time, value=value)
