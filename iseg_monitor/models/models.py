@@ -31,8 +31,8 @@ class Current(SQLModel, table=True):
     value: float # mA
     time: float
 
-class TimeSeries(BaseModel):
-    time: list[float]
-    value: list[float]
-    def __init__(self, time: list[float], value: list[float]):
+class TimeValSet(BaseModel):
+    time: float
+    value: float
+    def __init__(self, time: float, value: float):
         super().__init__(time=time, value=value)

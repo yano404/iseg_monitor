@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import List
 sys.path.append("../models")
-from models import Detector, Voltage, Current, TimeSeries
+from models import Detector, Voltage, Current, TimeValSet
 
 DOTENV_FILE = pathlib.Path(__file__).resolve().parent.parent.joinpath("conf/.env").resolve()
 load_dotenv(DOTENV_FILE)
@@ -39,7 +39,7 @@ async def get_detector_by_name(name: str):
         results = session.exec(statement).all()
     return results
 
-@app.get("/voltage/{det_id}", response_model=TimeSeries)
+@app.get("/voltage/{det_id}", response_model=list[TimeValSet])
 async def get_voltage(
     det_id: int,
     start: int | None = None,
@@ -54,15 +54,13 @@ async def get_voltage(
         if last is not None:
             statement = statement.where(Voltage.time > time.time() - last)
         results = session.exec(statement).all()
-    time = []
-    value = []
+    data = []
     if results:
         for res in results:
-            time.append(res.time)
-            value.append(res.value)
-    return TimeSeries(time, value)
+            data.append(TimeValSet(res.time, res.value))
+    return data
 
-@app.get("/current/{det_id}", response_model=TimeSeries)
+@app.get("/current/{det_id}", response_model=list[TimeValSet])
 async def get_current(
     det_id: int,
     start: int | None = None,
@@ -77,10 +75,8 @@ async def get_current(
         if last is not None:
             statement = statement.where(Current.time > time.time() - last)
         results = session.exec(statement).all()
-    time = []
-    value = []
+    data = []
     if results:
         for res in results:
-            time.append(res.time)
-            value.append(res.value)
-    return TimeSeries(time, value)
+            data.append(TimeValSet(res.time, res.value))
+    return data
