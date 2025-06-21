@@ -21,7 +21,7 @@ def main():
     password = os.environ.get("MPOD_PASS")
     baseurl = f"http://{hostname}:{port}"
     dbpath = os.environ.get("DBPATH")
-    interval = os.environ.get("LOG_INTERVAL")
+    interval = int(os.environ.get("LOG_INTERVAL"))
     conf_det_list = os.environ.get("DET_LIST")
 
     # Define functions to communicate with iCS
