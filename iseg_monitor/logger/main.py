@@ -26,28 +26,41 @@ def main():
 
     # Define functions to communicate with iCS
     def get_apikey():
-        r = requests.get(f"{baseurl}/api/login/{user}/{password}")
-        if r.ok:
-            return r.content.decode().replace('\n', '')
-        else:
-            print("Error: {r.status_code}")
+        try:
+            r = requests.get(f"{baseurl}/api/login/{user}/{password}")
+            if r.ok:
+                return r.content.decode().replace('\n', '')
+            else:
+                print("Error: {r.status_code}")
+                return None
+        except requests.exceptions.ConnectionError as err:
+            print(err)
             return None
 
     def measure_voltage(apikey, line="*", address="*", channel="*"):
-        r = requests.get(f"{baseurl}/api/getItem/{apikey}/{line}/{address}/{channel}/Status.voltageMeasure")
-        if r.ok:
-            return r.content
-        else:
-            print("Error: {r.status_code}")
+        try:
+            r = requests.get(f"{baseurl}/api/getItem/{apikey}/{line}/{address}/{channel}/Status.voltageMeasure")
+            if r.ok:
+                return r.content
+            else:
+                print("Error: {r.status_code}")
+                return None
+        except requests.exceptions.ConnectionError as err:
+            print(err)
             return None
     
     def measure_current(apikey, line="*", address="*", channel="*"):
-        r = requests.get(f"{baseurl}/api/getItem/{apikey}/{line}/{address}/{channel}/Status.currentMeasure")
-        if r.ok:
-            return r.content
-        else:
-            print("Error: {r.status_code}")
+        try:
+            r = requests.get(f"{baseurl}/api/getItem/{apikey}/{line}/{address}/{channel}/Status.currentMeasure")
+            if r.ok:
+                return r.content
+            else:
+                print("Error: {r.status_code}")
+                return None
+        except requests.exceptions.ConnectionError as err:
+            print(err)
             return None
+
 
     # Load Channel Map
     with open(conf_det_list) as f:
@@ -89,13 +102,23 @@ def main():
 
         # Get API
         apikey = get_apikey()
+
+        if not apikey:
+            continue
+
         print(apikey)
 
         # Measure Volatage
-        volts = json.loads(measure_voltage(apikey))
+        json_volts = measure_voltage(apikey)
+        if not json_volts:
+            continue
+        volts = json.loads(json_volts)
 
         # Measure Current
-        currents = json.loads(measure_current(apikey))
+        json_currents = measure_current(apikey)
+        if not json_currents:
+            continue
+        currents = json.loads(json_currents)
 
         # Commit Data
         with Session(engine) as session:
